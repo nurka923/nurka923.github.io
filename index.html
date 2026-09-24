@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hanna Melnik — AI & Marketing Automation</title>
+<meta name="description" content="Hanna Melnik — AI automation, marketing automation and email automation with n8n, Make, ActiveCampaign and LLMs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #06164a;
+    --blue-900: #0a2472;
+    --blue-700: #1e4fd8;
+    --blue-500: #2f7bff;
+    --blue-300: #7fb2ff;
+    --sky: #d9e8ff;
+    --ice: #f3f7ff;
+    --white: #ffffff;
+    --ink: #0d1b3e;
+    --muted: #51607f;
+    --radius: 18px;
+    --shadow: 0 18px 40px -18px rgba(10, 36, 114, .35);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Manrope", system-ui, -apple-system, Segoe UI, sans-serif;
+    color: var(--ink);
+    background: var(--white);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { width: min(1120px, 100% - 32px); margin-inline: auto; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+  /* ---------- Sections: blue / white / blue ---------- */
+  section { position: relative; padding: 96px 0; overflow-x: clip; }
+  .blue { background: linear-gradient(160deg, var(--navy), var(--blue-900) 55%, var(--blue-700)); color: var(--white); }
+  .white { background: var(--white); }
+  .ice { background: var(--ice); }
+  .eyebrow {
+    display: inline-block; font-size: .78rem; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--blue-700); margin-bottom: 12px;
+  }
+  .blue .eyebrow { color: var(--blue-300); }
+  h2 { font-size: clamp(1.9rem, 4vw, 2.8rem); line-height: 1.15; font-weight: 800; letter-spacing: -.02em; margin-bottom: 16px; }
+  .lead { font-size: 1.08rem; color: var(--muted); max-width: 640px; }
+  .blue .lead { color: #c5d6ff; }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: fixed; inset: 0 0 auto 0; z-index: 50;
+    transition: background .3s, box-shadow .3s;
+  }
+  nav.scrolled { background: rgba(6, 22, 74, .88); backdrop-filter: blur(12px); box-shadow: 0 6px 24px rgba(0,0,0,.15); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+  .logo { font-weight: 800; color: #fff; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+  .logo span.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--blue-300); box-shadow: 0 0 0 4px rgba(127,178,255,.25); animation: pulse 2s infinite; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: #dbe6ff; font-weight: 600; font-size: .95rem; position: relative; }
+  .nav-links a::after { content: ""; position: absolute; left: 0; bottom: -4px; height: 2px; width: 0; background: var(--blue-300); transition: width .25s; }
+  .nav-links a:hover::after { width: 100%; }
+  .menu-btn { display: none; background: none; border: 0; color: #fff; font-size: 1.6rem; cursor: pointer; }
+
+  /* ---------- Hero ---------- */
+  .hero { min-height: 100vh; display: flex; align-items: center; padding-top: 120px; overflow: hidden; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; animation: float 14s ease-in-out infinite; pointer-events: none; }
+  .blob.b1 { width: 420px; height: 420px; background: #2f7bff; top: -80px; right: -60px; }
+  .blob.b2 { width: 320px; height: 320px; background: #5fd3ff; bottom: -60px; left: -80px; animation-delay: -5s; opacity: .35; }
+  .grid-bg {
+    position: absolute; inset: 0; pointer-events: none; opacity: .18;
+    background-image: linear-gradient(rgba(255,255,255,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+  }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; position: relative; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); font-size: .85rem; font-weight: 600; margin-bottom: 22px;
+  }
+  .badge i { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 0 3px rgba(74,222,128,.25); }
+  h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); line-height: 1.05; font-weight: 800; letter-spacing: -.03em; margin-bottom: 18px; }
+  h1 .grad { background: linear-gradient(90deg, #fff, var(--blue-300)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .typed-line { font-size: clamp(1.15rem, 2.4vw, 1.45rem); font-weight: 600; color: #dbe6ff; min-height: 2.2em; }
+  .typed { color: #fff; border-right: 3px solid var(--blue-300); padding-right: 4px; animation: caret 1s step-end infinite; }
+  .hero p.sub { color: #c5d6ff; max-width: 520px; margin: 10px 0 30px; font-size: 1.05rem; }
+  .btns { display: flex; flex-wrap: wrap; gap: 14px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; border-radius: 999px;
+    font-weight: 700; transition: transform .2s, box-shadow .2s, background .2s; cursor: pointer; border: 0; font-size: 1rem;
+  }
+  .btn.primary { background: #fff; color: var(--blue-900); box-shadow: 0 10px 30px -10px rgba(255,255,255,.5); }
+  .btn.primary:hover { transform: translateY(-3px); box-shadow: 0 16px 36px -10px rgba(255,255,255,.6); }
+  .btn.ghost { color: #fff; border: 1.5px solid rgba(255,255,255,.4); }
+  .btn.ghost:hover { background: rgba(255,255,255,.1); transform: translateY(-3px); }
+  .btn.solid { background: var(--blue-700); color: #fff; }
+  .btn.solid:hover { background: var(--blue-500); transform: translateY(-3px); }
+
+  /* Workflow card in hero */
+  .flow-card {
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18); border-radius: 22px;
+    padding: 22px; backdrop-filter: blur(8px); box-shadow: 0 30px 60px -20px rgba(0,0,0,.45);
+    transform: perspective(900px) rotateY(-6deg) rotateX(3deg); transition: transform .5s;
+  }
+  .flow-card:hover { transform: perspective(900px) rotateY(0) rotateX(0); }
+  .flow-head { display: flex; align-items: center; justify-content: space-between; font-size: .8rem; color: #c5d6ff; margin-bottom: 14px; }
+  .flow-head .dots span { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.3); margin-right: 5px; }
+  .flow-head .live { color: #4ade80; font-weight: 700; }
+  .flow-svg { width: 100%; height: auto; display: block; }
+  .flow-svg .node rect { fill: rgba(255,255,255,.95); }
+  .flow-svg .node text { fill: var(--blue-900); font: 700 12px Manrope, sans-serif; }
+  .flow-svg .node .ico { font-size: 16px; }
+  .flow-svg .wire { stroke: rgba(127,178,255,.55); stroke-width: 2; fill: none; stroke-dasharray: 5 6; animation: dash 1.2s linear infinite; }
+  .flow-svg .pulse { fill: #fff; filter: drop-shadow(0 0 6px #7fb2ff); }
+  .flow-log { margin-top: 14px; font-size: .78rem; color: #c5d6ff; background: rgba(0,0,0,.2); border-radius: 12px; padding: 10px 14px; height: 74px; overflow: hidden; }
+  .flow-log div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; animation: fadeUp .4s ease; }
+  .flow-log .ok { color: #4ade80; }
+
+  .scroll-hint { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); color: #c5d6ff; font-size: .8rem; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .scroll-hint span { width: 22px; height: 36px; border: 2px solid rgba(255,255,255,.5); border-radius: 12px; position: relative; }
+  .scroll-hint span::after { content: ""; position: absolute; left: 50%; top: 6px; width: 4px; height: 8px; background: #fff; border-radius: 2px; transform: translateX(-50%); animation: wheel 1.6s infinite; }
+
+  /* ---------- Stats ---------- */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: -48px; position: relative; z-index: 3; }
+  .stat {
+    background: #fff; border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); text-align: center;
+    border: 1px solid var(--sky);
+  }
+  .stat b { display: block; font-size: 2.3rem; font-weight: 800; color: var(--blue-700); line-height: 1.1; }
+  .stat small { color: var(--muted); font-weight: 600; font-size: .9rem; }
+
+  /* ---------- Services ---------- */
+  .cards3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 44px; }
+  .card {
+    background: #fff; border: 1px solid var(--sky); border-radius: var(--radius); padding: 30px;
+    transition: transform .3s, box-shadow .3s, border-color .3s; position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 4px;
+    background: linear-gradient(90deg, var(--blue-700), var(--blue-300)); transform: scaleX(0); transform-origin: left; transition: transform .4s;
+  }
+  .card:hover { transform: translateY(-8px); box-shadow: var(--shadow); border-color: var(--blue-300); }
+  .card:hover::before { transform: scaleX(1); }
+  .icon {
+    width: 54px; height: 54px; border-radius: 14px; display: grid; place-items: center; font-size: 1.6rem;
+    background: linear-gradient(135deg, var(--sky), #fff); border: 1px solid var(--sky); margin-bottom: 18px;
+    transition: transform .4s;
+  }
+  .card:hover .icon { transform: rotate(-8deg) scale(1.08); }
+  .card h3 { font-size: 1.2rem; margin-bottom: 10px; }
+  .card p { color: var(--muted); font-size: .97rem; }
+  .card ul { list-style: none; margin-top: 14px; }
+  .card li { padding-left: 22px; position: relative; font-size: .93rem; color: var(--ink); margin: 6px 0; }
+  .card li::before { content: "✓"; position: absolute; left: 0; color: var(--blue-700); font-weight: 800; }
+
+  .promise { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 12px; }
+  .pill { padding: 10px 18px; border-radius: 999px; background: var(--ice); border: 1px solid var(--sky); font-weight: 600; font-size: .92rem; color: var(--blue-900); }
+
+  /* ---------- Tools ---------- */
+  .marquee { overflow: hidden; margin: 40px 0 10px; mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+  .track { display: flex; gap: 14px; width: max-content; animation: scroll 38s linear infinite; }
+  .marquee:hover .track { animation-play-state: paused; }
+  .chip {
+    padding: 12px 20px; border-radius: 14px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2);
+    font-weight: 700; white-space: nowrap; transition: background .2s, transform .2s;
+  }
+  .chip:hover { background: #fff; color: var(--blue-900); transform: translateY(-3px); }
+  .tool-groups { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 34px; }
+  .tg { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.15); border-radius: var(--radius); padding: 22px; transition: background .3s, transform .3s; }
+  .tg:hover { background: rgba(255,255,255,.12); transform: translateY(-4px); }
+  .tg h4 { font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--blue-300); margin-bottom: 12px; }
+  .tg .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tg .tags span { font-size: .88rem; padding: 5px 12px; border-radius: 999px; background: rgba(255,255,255,.12); }
+
+  /* ---------- Projects ---------- */
+  .filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 30px 0 28px; }
+  .filter {
+    padding: 9px 18px; border-radius: 999px; border: 1.5px solid var(--sky); background: #fff; color: var(--blue-900);
+    font-weight: 700; font-size: .9rem; cursor: pointer; transition: all .2s; font-family: inherit;
+  }
+  .filter:hover { border-color: var(--blue-500); }
+  .filter.active { background: var(--blue-700); border-color: var(--blue-700); color: #fff; }
+  .projects { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+  .project {
+    background: #fff; border: 1px solid var(--sky); border-radius: var(--radius); padding: 28px; display: flex; flex-direction: column;
+    transition: transform .3s, box-shadow .3s, opacity .3s; position: relative;
+  }
+  .project:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+  .project.hide { display: none; }
+  .p-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .status { font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; padding: 5px 11px; border-radius: 999px; }
+  .status.built { background: #dcfce7; color: #166534; }
+  .status.designed { background: var(--sky); color: var(--blue-900); }
+  .status.product { background: #fef3c7; color: #92400e; }
+  .date { font-size: .82rem; color: var(--muted); font-weight: 600; }
+  .project h3 { font-size: 1.22rem; line-height: 1.3; margin-bottom: 10px; }
+  .project > p { color: var(--muted); font-size: .96rem; }
+  .chain { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 16px 0; }
+  .chain span { font-size: .78rem; font-weight: 700; padding: 5px 10px; border-radius: 8px; background: var(--ice); border: 1px solid var(--sky); color: var(--blue-900); }
+  .chain em { color: var(--blue-500); font-style: normal; font-weight: 800; }
+  .project details { margin-top: auto; border-top: 1px dashed var(--sky); padding-top: 14px; }
+  .project summary { cursor: pointer; font-weight: 700; color: var(--blue-700); list-style: none; display: flex; align-items: center; gap: 8px; font-size: .95rem; }
+  .project summary::-webkit-details-marker { display: none; }
+  .project summary::after { content: "+"; font-size: 1.2rem; transition: transform .25s; }
+  .project details[open] summary::after { transform: rotate(45deg); }
+  .project details ul { margin: 12px 0 0 18px; color: var(--ink); font-size: .92rem; }
+  .project details li { margin: 5px 0; }
+  .media {
+    position: relative; margin: -28px -28px 20px; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden;
+    aspect-ratio: 16 / 9; background: #f7f7f7; border-bottom: 1px solid var(--sky); cursor: zoom-in;
+  }
+  .media.dark { background: #1b1b1b; }
+  .media img, .media video { width: 100%; height: 100%; object-fit: contain; display: block; transition: transform .5s; }
+  .media video { cursor: default; background: #000; }
+  .project:hover .media img { transform: scale(1.04); }
+  .media .zoom {
+    position: absolute; right: 12px; bottom: 12px; background: rgba(6,22,74,.85); color: #fff; font-size: .75rem; font-weight: 700;
+    padding: 5px 10px; border-radius: 999px; opacity: 0; transform: translateY(6px); transition: all .25s; pointer-events: none;
+  }
+  .project:hover .media .zoom { opacity: 1; transform: none; }
+  .media .tag-live {
+    position: absolute; left: 12px; top: 12px; background: #16a34a; color: #fff; font-size: .72rem; font-weight: 800;
+    padding: 4px 10px; border-radius: 999px; letter-spacing: .05em; pointer-events: none;
+  }
+  .media.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--sky); }
+  .media.duo img { background: #f7f7f7; }
+  .result {
+    margin: 14px 0 0; padding: 10px 14px; border-radius: 12px; font-size: .9rem; color: var(--blue-900);
+    background: linear-gradient(90deg, var(--ice), #fff); border-left: 3px solid var(--blue-700);
+  }
+  .result b { color: var(--blue-700); }
+  .result small { color: var(--muted); }
+  .up-link { margin-top: 12px; font-size: .88rem; font-weight: 700; color: var(--muted); align-self: flex-start; transition: color .2s; }
+  .up-link:hover { color: var(--blue-700); }
+  .more { text-align: center; margin-top: 34px; }
+  .btn.outline { border: 1.5px solid var(--blue-700); color: var(--blue-700); background: #fff; }
+  .btn.outline:hover { background: var(--blue-700); color: #fff; transform: translateY(-3px); }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100; background: rgba(4, 12, 40, .92); display: none; place-items: center; padding: 24px; cursor: zoom-out;
+  }
+  .lightbox.open { display: grid; animation: fadeUp .25s ease; }
+  .lightbox img { max-width: 100%; max-height: 82vh; border-radius: 12px; box-shadow: 0 30px 80px rgba(0,0,0,.5); background: #fff; }
+  .lightbox p { color: #dbe6ff; text-align: center; margin-top: 14px; font-weight: 600; }
+  .lightbox button { position: absolute; top: 16px; right: 20px; background: none; border: 0; color: #fff; font-size: 2rem; cursor: pointer; }
+  .note { margin-top: 26px; font-size: .9rem; color: var(--muted); text-align: center; }
+
+  /* ---------- Process ---------- */
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 48px; position: relative; }
+  .steps::before {
+    content: ""; position: absolute; top: 30px; left: 10%; right: 10%; height: 2px;
+    background: linear-gradient(90deg, rgba(127,178,255,.2), var(--blue-300), rgba(127,178,255,.2));
+  }
+  .step { text-align: center; position: relative; }
+  .num {
+    width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 16px; display: grid; place-items: center;
+    background: #fff; color: var(--blue-900); font-weight: 800; font-size: 1.2rem; position: relative;
+    box-shadow: 0 0 0 6px rgba(127,178,255,.2); transition: transform .3s, box-shadow .3s;
+  }
+  .step:hover .num { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(127,178,255,.3); }
+  .step h4 { font-size: 1.05rem; margin-bottom: 6px; }
+  .step p { font-size: .9rem; color: #c5d6ff; }
+
+  /* ---------- Certifications + Playbook ---------- */
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 40px; }
+  .cert { display: flex; gap: 16px; align-items: center; background: #fff; border: 1px solid var(--sky); border-radius: var(--radius); padding: 22px; margin-bottom: 16px; transition: transform .3s, box-shadow .3s; }
+  .cert:hover { transform: translateX(6px); box-shadow: var(--shadow); }
+  .cert .icon { margin: 0; flex-shrink: 0; }
+  .cert h4 { font-size: 1.05rem; }
+  .cert small { color: var(--muted); }
+  .tips { background: var(--navy); color: #fff; border-radius: var(--radius); padding: 26px; position: relative; overflow: hidden; }
+  .tips h4 { margin-bottom: 14px; color: var(--blue-300); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; }
+  .tip { font-size: 1.02rem; min-height: 96px; transition: opacity .4s; }
+  .tip b { color: var(--blue-300); }
+  .tip-dots { display: flex; gap: 6px; margin-top: 14px; }
+  .tip-dots button { width: 9px; height: 9px; border-radius: 50%; border: 0; background: rgba(255,255,255,.3); cursor: pointer; padding: 0; transition: background .2s, width .2s; }
+  .tip-dots button.on { background: var(--blue-300); width: 24px; border-radius: 6px; }
+
+  /* ---------- Contact ---------- */
+  .contact-box { display: grid; grid-template-columns: auto 1fr; gap: 48px; align-items: center; }
+  .photo-ring {
+    width: 240px; height: 240px; border-radius: 50%; padding: 6px; position: relative;
+    background: conic-gradient(from 0deg, var(--blue-300), #fff, var(--blue-500), var(--blue-300));
+    animation: spin 8s linear infinite;
+  }
+  .photo-ring .inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: var(--blue-900); animation: spin 8s linear infinite reverse; display: grid; place-items: center; }
+  .photo-ring img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; display: block; }
+  .photo-ring .initials { font-size: 4rem; font-weight: 800; color: #fff; display: none; }
+  .photo-ring.noimg img { display: none; }
+  .photo-ring.noimg .initials { display: block; }
+  .contact-links { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; }
+  .reply { margin-top: 18px; color: #c5d6ff; font-size: .95rem; display: flex; align-items: center; gap: 8px; }
+
+  footer { background: var(--navy); color: #8ea6d9; text-align: center; padding: 26px 16px; font-size: .88rem; border-top: 1px solid rgba(255,255,255,.08); }
+
+  /* ---------- Reveal ---------- */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  .d1 { transition-delay: .1s; } .d2 { transition-delay: .2s; } .d3 { transition-delay: .3s; } .d4 { transition-delay: .4s; }
+
+  @keyframes float { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px,40px) scale(1.1); } }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 4px rgba(127,178,255,.25); } 50% { box-shadow: 0 0 0 8px rgba(127,178,255,.05); } }
+  @keyframes caret { 50% { border-color: transparent; } }
+  @keyframes dash { to { stroke-dashoffset: -22; } }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+  @keyframes wheel { 0% { opacity: 1; top: 6px; } 100% { opacity: 0; top: 18px; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 960px) {
+    .hero-grid, .two, .contact-box { grid-template-columns: 1fr; }
+    .flow-card { transform: none; }
+    .cards3, .tool-groups { grid-template-columns: 1fr 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .steps { grid-template-columns: 1fr; gap: 26px; }
+    .steps::before { display: none; }
+    .contact-box { text-align: center; justify-items: center; }
+    .contact-links, .reply { justify-content: center; }
+  }
+  @media (max-width: 720px) {
+    section { padding: 72px 0; }
+    .nav-links { position: fixed; top: 68px; left: 0; right: 0; flex-direction: column; gap: 0; background: var(--navy); max-height: 0; overflow: hidden; transition: max-height .35s; }
+    .nav-links.open { max-height: 400px; }
+    .nav-links a { padding: 14px 24px; border-top: 1px solid rgba(255,255,255,.08); }
+    .menu-btn { display: block; }
+    .cards3, .tool-groups, .projects { grid-template-columns: 1fr; }
+    .photo-ring { width: 190px; height: 190px; }
+    .scroll-hint { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<nav id="nav">
+  <div class="wrap">
+    <a href="#top" class="logo"><span class="dot"></span>Hanna Melnik</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="#services">Services</a>
+      <a href="#stack">Stack</a>
+      <a href="#projects">Projects</a>
+      <a href="#process">Process</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO (blue) ================= -->
+<section class="hero blue" id="top">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="grid-bg"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="badge reveal"><i></i> Open to new projects</div>
+      <h1 class="reveal d1">Hi, I'm <span class="grad">Hanna Melnik</span></h1>
+      <div class="typed-line reveal d2">I build <span class="typed" id="typed">AI automations</span></div>
+      <p class="sub reveal d3">I help businesses stop losing time to manual work. I build AI automation and marketing automation systems that run without them: chatbots, AI agents, email sequences, CRM workflows and lead routing.</p>
+      <div class="btns reveal d4">
+        <a href="#projects" class="btn primary">See my projects →</a>
+        <a href="#contact" class="btn ghost">Let's talk</a>
+      </div>
+    </div>
+
+    <div class="flow-card reveal d2" aria-label="Animated example of an automation workflow">
+      <div class="flow-head">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="mono">ai-email-campaign.json</span>
+        <span class="live">● running</span>
+      </div>
+      <svg class="flow-svg" viewBox="0 0 440 250" role="img" aria-label="Webhook to Claude AI to ActiveCampaign to Gmail to Telegram">
+        <path id="w1" class="wire" d="M92 55 C 130 55, 130 55, 168 55"/>
+        <path id="w2" class="wire" d="M272 55 C 320 55, 320 125, 348 125"/>
+        <path id="w3" class="wire" d="M348 150 C 300 150, 290 195, 272 195"/>
+        <path id="w4" class="wire" d="M168 195 C 130 195, 130 195, 92 195"/>
+        <circle r="5" class="pulse"><animateMotion dur="1.4s" repeatCount="indefinite"><mpath href="#w1"/></animateMotion></circle>
+        <circle r="5" class="pulse"><animateMotion dur="1.4s" begin=".35s" repeatCount="indefinite"><mpath href="#w2"/></animateMotion></circle>
+        <circle r="5" class="pulse"><animateMotion dur="1.4s" begin=".7s" repeatCount="indefinite"><mpath href="#w3"/></animateMotion></circle>
+        <circle r="5" class="pulse"><animateMotion dur="1.4s" begin="1.05s" repeatCount="indefinite"><mpath href="#w4"/></animateMotion></circle>
+
+        <g class="node"><rect x="8" y="32" width="84" height="46" rx="12"/><text x="50" y="52" text-anchor="middle" class="ico">⚡</text><text x="50" y="69" text-anchor="middle">Webhook</text></g>
+        <g class="node"><rect x="168" y="32" width="104" height="46" rx="12"/><text x="220" y="52" text-anchor="middle" class="ico">🤖</text><text x="220" y="69" text-anchor="middle">Claude AI</text></g>
+        <g class="node"><rect x="348" y="100" width="84" height="70" rx="12"/><text x="390" y="128" text-anchor="middle" class="ico">📇</text><text x="390" y="146" text-anchor="middle">Active</text><text x="390" y="160" text-anchor="middle">Campaign</text></g>
+        <g class="node"><rect x="168" y="172" width="104" height="46" rx="12"/><text x="220" y="192" text-anchor="middle" class="ico">✉️</text><text x="220" y="209" text-anchor="middle">Gmail</text></g>
+        <g class="node"><rect x="8" y="172" width="84" height="46" rx="12"/><text x="50" y="192" text-anchor="middle" class="ico">📣</text><text x="50" y="209" text-anchor="middle">Telegram</text></g>
+      </svg>
+      <div class="flow-log mono" id="flowLog"></div>
+    </div>
+  </div>
+  <a href="#services" class="scroll-hint"><span></span>scroll</a>
+</section>
+
+<!-- ================= SERVICES (white) ================= -->
+<section class="white" id="services">
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat reveal"><b data-count="11">0</b><small>automation systems built & designed</small></div>
+      <div class="stat reveal d1"><b data-count="20" data-suffix="+">0</b><small>tools & APIs used hands-on</small></div>
+      <div class="stat reveal d2"><b data-count="5" data-prefix="&lt;" data-suffix="s">0</b><small>from lead to inbox in my AI email pipeline</small></div>
+      <div class="stat reveal d3"><b data-count="5" data-suffix="h">0</b><small>max reply time with a concrete plan</small></div>
+    </div>
+
+    <div style="margin-top:88px">
+      <span class="eyebrow reveal">What I do</span>
+      <h2 class="reveal">Where AI meets marketing automation</h2>
+      <p class="lead reveal">I work at the point where AI integration (chatbots, voice bots, AI agents, LLM pipelines) meets marketing automation (email sequences, CRM workflows, lead routing, multi-platform sync).</p>
+    </div>
+
+    <div class="cards3">
+      <div class="card reveal">
+        <div class="icon">🤖</div>
+        <h3>AI Automation</h3>
+        <p>AI assistants and agents that work inside your tools, not in a separate chat window.</p>
+        <ul><li>Telegram AI bots (text + voice)</li><li>LLM pipelines: Claude, OpenAI, OpenRouter, Groq</li><li>Voice to text with Whisper</li><li>Multi-agent content systems</li></ul>
+      </div>
+      <div class="card reveal d1">
+        <div class="icon">✉️</div>
+        <h3>Email & Marketing Automation</h3>
+        <p>Personalised email flows and CRM logic that react to your leads automatically.</p>
+        <ul><li>ActiveCampaign automations & API</li><li>AI-personalised emails by lead tag</li><li>Lead scoring, tagging and routing</li><li>Nurture sequences and pipelines</li></ul>
+      </div>
+      <div class="card reveal d2">
+        <div class="icon">🔗</div>
+        <h3>Integrations & Data Sync</h3>
+        <p>Your apps talk to each other, with no duplicates and no silent failures.</p>
+        <ul><li>n8n and Make.com workflows</li><li>Webhooks, REST APIs, Postman</li><li>Payments → CRM → Airtable sync</li><li>Error alerts sent to Telegram</li></ul>
+      </div>
+    </div>
+
+    <div class="promise reveal">
+      <span class="pill">📄 Documented workflows</span>
+      <span class="pill">🏷️ Clearly named nodes</span>
+      <span class="pill">🛡️ Error handlers built in</span>
+      <span class="pill">🎥 Clear handover</span>
+      <span class="pill">⏱️ Reply within 5 hours</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STACK (blue) ================= -->
+<section class="blue" id="stack">
+  <div class="wrap">
+    <span class="eyebrow reveal">Tool stack</span>
+    <h2 class="reveal">Tools I've actually built with</h2>
+    <p class="lead reveal">Every tool below has been used hands-on in a working or tested build.</p>
+  </div>
+  <div class="marquee reveal">
+    <div class="track" id="track">
+      <span class="chip">n8n</span><span class="chip">Make.com</span><span class="chip">ActiveCampaign</span><span class="chip">Claude API</span>
+      <span class="chip">OpenAI GPT-4o-mini</span><span class="chip">Whisper</span><span class="chip">OpenRouter</span><span class="chip">Groq</span>
+      <span class="chip">Pipedrive</span><span class="chip">Airtable</span><span class="chip">Google Sheets</span><span class="chip">Gmail</span>
+      <span class="chip">Telegram Bot API</span><span class="chip">WayForPay</span><span class="chip">Webhooks</span><span class="chip">REST APIs</span>
+      <span class="chip">JavaScript</span><span class="chip">Python</span><span class="chip">Postman</span><span class="chip">Zapier</span><span class="chip">ManyChat</span><span class="chip">Make AI Toolkit</span><span class="chip">Google Drive</span><span class="chip">Google Docs</span>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="tool-groups">
+      <div class="tg reveal"><h4>Automation</h4><div class="tags"><span>n8n</span><span>Make.com</span><span>Zapier</span><span>ManyChat</span><span>Webhooks</span></div></div>
+      <div class="tg reveal d1"><h4>CRM & Email</h4><div class="tags"><span>ActiveCampaign API v3</span><span>Pipedrive</span><span>Gmail</span></div></div>
+      <div class="tg reveal d2"><h4>AI / LLM</h4><div class="tags"><span>Claude API</span><span>OpenAI</span><span>Whisper</span><span>OpenRouter</span><span>Groq</span><span>Make AI Toolkit</span></div></div>
+      <div class="tg reveal"><h4>Data & Docs</h4><div class="tags"><span>Airtable</span><span>Google Sheets</span><span>Google Drive</span><span>Google Docs</span></div></div>
+      <div class="tg reveal d1"><h4>Messaging & Payments</h4><div class="tags"><span>Telegram Bot API</span><span>WayForPay</span></div></div>
+      <div class="tg reveal d2"><h4>Dev</h4><div class="tags"><span>JavaScript</span><span>Python</span><span>REST APIs</span><span>Postman</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROJECTS (white) ================= -->
+<section class="white" id="projects">
+  <div class="wrap">
+    <span class="eyebrow reveal">Portfolio</span>
+    <h2 class="reveal">Things I've built</h2>
+    <p class="lead reveal">I built and tested these systems end to end in my own n8n, Make and ManyChat accounts. Click a screenshot to enlarge it, or open a card to see how it works.</p>
+
+    <div class="filters reveal" id="filters">
+      <button class="filter active" data-f="all">All</button>
+      <button class="filter" data-f="ai">AI</button>
+      <button class="filter" data-f="bots">Chatbots</button>
+      <button class="filter" data-f="email">Email & CRM</button>
+      <button class="filter" data-f="sync">Integrations</button>
+      <button class="filter" data-f="content">Content</button>
+    </div>
+
+    <div class="projects">
+      <article class="project reveal" data-cat="ai email">
+        <div class="media dark">
+          <video src="assets/n8n-ai-email-campaign.mp4" poster="assets/n8n-ai-email-campaign-poster.jpg" muted loop playsinline autoplay preload="metadata" controls aria-label="Recording of the n8n workflow executing successfully"></video>
+          <span class="tag-live">▶ LIVE RUN</span>
+        </div>
+        <div class="p-top"><span class="status built">Built</span><span class="date">n8n · ActiveCampaign · Claude</span></div>
+        <h3>AI Outreach Pipeline: Personal Email for Every Lead</h3>
+        <p>A fully automated outreach pipeline that removes manual email writing for every incoming lead. Claude writes a personalised subject line and a 3-sentence email from the lead's name, company and status. The email goes out through Gmail, the CRM is updated and a Telegram summary arrives in real time.</p>
+        <div class="result"><b>0</b> manual emails · <b>&lt;5 s</b> from lead to inbox · <b>100%</b> CRM tracking <small>(in test runs)</small></div>
+        <div class="chain"><span>Webhook</span><em>→</em><span>AC lookup</span><em>→</em><span>Claude AI</span><em>→</em><span>Gmail</span><em>→</em><span>AC custom fields</span><em>→</em><span>Segment & tag</span><em>→</em><span>Telegram</span></div>
+        <details><summary>How it works</summary>
+          <ul>
+            <li>A webhook receives the lead data (email, first name, company)</li>
+            <li>An ActiveCampaign API lookup finds the contact and reads its tags</li>
+            <li>A contact that was already emailed is skipped, so nobody gets a duplicate</li>
+            <li>Claude returns strict JSON with subject and body, parsed in a Code node</li>
+            <li>The email content is saved to custom fields on the ActiveCampaign contact</li>
+            <li>Warm leads are segmented and tagged in the pipeline</li>
+            <li>The video above is a real run that ends with "Workflow executed successfully"</li>
+          </ul>
+        </details>
+        <a class="up-link" href="https://www.upwork.com/freelancers/~017cfb05fbe9def481?p=2072301351231492096" target="_blank" rel="noopener">View on Upwork ↗</a>
+      </article>
+
+      <article class="project reveal d1" data-cat="ai bots">
+        <div class="media dark">
+          <img src="assets/n8n-telegram-ai-assistant.png" data-caption="n8n: AI assistant with access check, voice transcription and multi-LLM chain" alt="n8n workflow: Telegram trigger, access check, filter, switch, voice download, speech to text, Basic LLM Chain with OpenRouter and OpenAI models" loading="lazy">
+          <span class="zoom">🔍 Enlarge</span>
+        </div>
+        <div class="p-top"><span class="status built">Built</span><span class="date">n8n · Bot API · Speech-to-Text</span></div>
+        <h3>AI Assistant Bot with Voice Recognition & Multi-LLM Routing</h3>
+        <p>A production-ready AI assistant on n8n. Text messages go straight to a Basic LLM Chain. Voice messages are downloaded, transcribed with Speech-to-Text, then processed by AI before the reply is sent. Unauthorised users are blocked at the access-check stage, and the bot can publish content to channels automatically.</p>
+        <div class="chain"><span>Trigger</span><em>→</em><span>Access check</span><em>→</em><span>Switch</span><em>→</em><span>Voice → Text</span><em>→</em><span>LLM Chain</span><em>→</em><span>Answer</span></div>
+        <details><summary>How it works</summary>
+          <ul>
+            <li>Access control by chat.id; everyone else gets a "prohibited" message</li>
+            <li>A Switch node routes /start, /clear and free text</li>
+            <li>Voice branch: download file → Speech to Text (Whisper) → AI</li>
+            <li>Multi-LLM: OpenRouter and OpenAI chat models, with fallback when one hits a rate limit</li>
+            <li>A "typing…" indicator while the AI works, and memory per user</li>
+            <li>A separate error workflow sends a Telegram alert with the failed node</li>
+          </ul>
+        </details>
+        <a class="up-link" href="https://www.upwork.com/freelancers/~017cfb05fbe9def481?p=2046256747833188352" target="_blank" rel="noopener">View on Upwork ↗</a>
+      </article>
+
+      <article class="project reveal" data-cat="ai bots email">
+        <div class="media">
+          <img src="assets/make-sentiment-support-bot.png" data-caption="Make.com: support bot with AI sentiment analysis, intent routing and team alerts" alt="Make scenario: Telegram Bot watch updates, Make AI Toolkit analyze sentiment and ask anything, router sending negative messages to email and others to a Telegram reply" loading="lazy">
+          <span class="zoom">🔍 Enlarge</span>
+        </div>
+        <div class="p-top"><span class="status built">Built</span><span class="date">Make.com · AI Toolkit · Telegram</span></div>
+        <h3>AI Support Bot with Sentiment & Team Alerts</h3>
+        <p>A customer support automation that listens for messages and runs two AI operations in parallel: sentiment analysis and intent routing. Positive messages get an automatic AI reply. Negative messages also trigger an email alert to a team member, so unhappy customers always reach a person.</p>
+        <div class="chain"><span>Bot trigger</span><em>→</em><span>Sentiment AI</span><span>Intent AI</span><em>→</em><span>Router</span><em>→</em><span>AI reply / Team email</span></div>
+        <details><summary>How it works</summary>
+          <ul>
+            <li>Telegram Bot "Watch Updates" trigger with a filter</li>
+            <li>Make AI Toolkit: "Analyze sentiment" and "Ask anything" for the answer</li>
+            <li>Router route 1 (negative) emails a team member for human follow-up</li>
+            <li>Route 2 sends the AI reply straight back in Telegram</li>
+            <li>Routine questions are handled automatically; hard ones go to people</li>
+          </ul>
+        </details>
+        <a class="up-link" href="https://www.upwork.com/freelancers/~017cfb05fbe9def481?p=1993303962293874688" target="_blank" rel="noopener">View on Upwork ↗</a>
+      </article>
+
+      <article class="project reveal d1" data-cat="ai sync content">
+        <div class="media duo">
+          <img src="assets/make-receipt-extractor.png" data-caption="Scenario 1: Google Drive → AI Content Extractor (receipt) → Google Sheets" alt="Make scenario: Google Drive watch files in a folder, download a file, Make AI Content Extractor, Google Sheets add a row" loading="lazy">
+          <img src="assets/make-ai-doc-generator.png" data-caption="Scenario 2: Google Sheets new row → Make AI Toolkit → Google Docs from a template" alt="Make scenario: Google Sheets watch new rows, Make AI Toolkit ask anything, Google Docs create a document from a template" loading="lazy">
+          <span class="zoom">🔍 Enlarge</span>
+        </div>
+        <div class="p-top"><span class="status built">Built</span><span class="date">Make.com · Document AI</span></div>
+        <h3>AI Receipt Extraction & Document Generation</h3>
+        <p>Two linked scenarios for intelligent document processing. The first watches a folder, downloads each new receipt or invoice, has AI parse it and writes structured data as a new row, with zero manual entry. The second is triggered by that new row and auto-generates a formatted document from a template.</p>
+        <div class="chain"><span>Drive folder</span><em>→</em><span>AI extractor</span><em>→</em><span>Sheets row</span><em>→</em><span>AI Toolkit</span><em>→</em><span>Docs template</span></div>
+        <details><summary>How it works</summary>
+          <ul>
+            <li>Scenario 1: Google Drive "Watch Files in a Folder" → Download → Make AI Content Extractor ("Extract information from a receipt") → Google Sheets "Add a Row"</li>
+            <li>Scenario 2: Google Sheets "Watch New Rows" → Make AI Toolkit → Google Docs "Create a Document from a Template"</li>
+            <li>The Sheet is the hand-off between the two scenarios, so each part can be tested on its own</li>
+          </ul>
+        </details>
+        <a class="up-link" href="https://www.upwork.com/freelancers/~017cfb05fbe9def481?p=1995587081936023552" target="_blank" rel="noopener">View on Upwork ↗</a>
+      </article>
+
+      <article class="project reveal" data-cat="ai bots email">
+        <div class="p-top"><span class="status built">Built</span><span class="date">ManyChat · Make.com · Zapier</span></div>
+        <h3>AI Chatbot: Lead Capture & Booking for a Clinic</h3>
+        <p>An AI chatbot for a psychotherapy clinic scenario. It greets visitors, answers questions about services and therapists, and guides people towards booking with a "Call me" button. When someone taps it, the bot collects their phone number and sends a personalised confirmation. Negative or complex questions go to staff, and every lead is logged and passed into marketing automation sequences.</p>
+        <div class="chain"><span>Greeting</span><em>→</em><span>AI answers</span><em>→</em><span>"Call me"</span><em>→</em><span>Phone capture</span><em>→</em><span>Confirmation</span><em>→</em><span>Nurture sequence</span></div>
+        <details><summary>How it works</summary>
+          <ul>
+            <li>AI answers FAQs about services and therapists</li>
+            <li>A "Call me" CTA collects the phone number and sends a personalised confirmation</li>
+            <li>Negative or complex questions are escalated to staff</li>
+            <li>Leads are logged and routed into follow-up sequences through Make / Zapier</li>
+            <li>Designed to take most of the routine intake work off the team</li>
+          </ul>
+        </details>
+        <a class="up-link" href="https://www.upwork.com/freelancers/~017cfb05fbe9def481?p=1987467565158031360" target="_blank" rel="noopener">View on Upwork ↗</a>
+      </article>
+
+      <article class="project reveal d1" data-cat="email">
+        <div class="p-top"><span class="status built">Built</span><span class="date">ActiveCampaign · Email</span></div>
+        <h3>Email Automation with Conditions & Segmentation</h3>
+        <p>A multi-step email sequence triggered when a contact subscribes to a list. After the first email, a conditional branch checks behaviour or contact data: engaged contacts get a content offer, everyone else gets a nurture email. The whole branching logic is documented in a visual flowchart for an easy handover.</p>
+        <div class="chain"><span>List subscribe</span><em>→</em><span>Welcome email</span><em>→</em><span>If / else</span><em>→</em><span>Content offer</span><span>Nurture email</span></div>
+        <details><summary>Where it fits</summary>
+          <ul>
+            <li>Onboarding flows for new subscribers</li>
+            <li>Lead nurturing based on engagement</li>
+            <li>Post-purchase sequences</li>
+            <li>Includes a flowchart so the owner can edit it later without me</li>
+          </ul>
+        </details>
+        <a class="up-link" href="https://www.upwork.com/freelancers/~017cfb05fbe9def481?p=1974854188476141568" target="_blank" rel="noopener">View on Upwork ↗</a>
+      </article>
+
+      <article class="project reveal" data-cat="sync">
+        <div class="p-top"><span class="status designed">Test task</span><span class="date">n8n · Pipedrive · Airtable</span></div>
+        <h3>CRM Automation: Payments → Pipedrive → Airtable</h3>
+        <p><b>The problem:</b> WayForPay payments, Pipedrive deals and Airtable reports as three disconnected tools, with manual reconciliation and double invoicing from duplicate webhooks. <b>The solution:</b> one n8n pipeline that connects payments, CRM and reporting.</p>
+        <div class="result">Designed to turn a daily manual task into an automated pipeline with <b>sub-minute</b> latency and a <b>full audit trail</b></div>
+        <div class="chain"><span>Webhook + signature</span><em>→</em><span>Deal search + dedup</span><em>→</em><span>Invoice "Paid"</span><em>→</em><span>Airtable report</span><em>→</em><span>Alerts</span></div>
+        <details><summary>How it works</summary>
+          <ul>
+            <li>Webhook intake with signature checks</li>
+            <li>Parallel deal search by email and account number, with duplicates removed</li>
+            <li>Invoices are updated to "Paid" automatically</li>
+            <li>Type-validated reporting to Airtable</li>
+            <li>An error log and an instant Telegram alert for unmatched payments</li>
+            <li>Idempotent design: zero duplicates even when webhooks arrive at the same time</li>
+          </ul>
+        </details>
+        <a class="up-link" href="https://www.upwork.com/freelancers/~017cfb05fbe9def481?p=2065333102113841152" target="_blank" rel="noopener">View on Upwork ↗</a>
+      </article>
+
+      <article class="project reveal d1" data-cat="bots">
+        <div class="media">
+          <img src="assets/manychat-telegram-sales-bot.png" data-caption="ManyChat: Telegram sales bot with a pricing menu and plan branches" alt="ManyChat automation: Telegram welcome message, membership menu with monthly, quarterly, annual and personal packages, each with price and call to action" loading="lazy">
+          <span class="zoom">🔍 Enlarge</span>
+        </div>
+        <div class="p-top"><span class="status built">Built</span><span class="date">ManyChat · Telegram</span></div>
+        <h3>Telegram Sales Bot for a Fitness Studio</h3>
+        <p>A ManyChat bot that walks a visitor through membership options, shows the price and what's included for each plan, and moves interested people to contact collection. Written in Ukrainian for a local studio scenario.</p>
+        <div class="chain"><span>Welcome</span><em>→</em><span>Plan menu</span><em>→</em><span>Price & benefits</span><em>→</em><span>"I'm interested"</span><em>→</em><span>Contact capture</span></div>
+        <details><summary>How it works</summary>
+          <ul>
+            <li>Menu buttons: monthly, quarterly and annual membership, personal packages and main menu</li>
+            <li>Each plan shows price, savings (10% quarterly, 20% annual) and what's included</li>
+            <li>Personal packages of 5, 10 or 20 sessions, priced by trainer level</li>
+            <li>Every plan ends with "Yes, I'm interested" or "Choose another" so no one hits a dead end</li>
+          </ul>
+        </details>
+      </article>
+
+      <article class="project reveal" data-cat="ai content">
+        <div class="p-top"><span class="status built">Built</span><span class="date">Make.com · OpenAI · Airtable</span></div>
+        <h3>AI Content Pipeline for Telegram</h3>
+        <p>Add a topic in Airtable and GPT-4o-mini writes the post. A person approves it in Airtable, then it is published to the Telegram channel automatically.</p>
+        <div class="chain"><span>Airtable</span><em>→</em><span>OpenAI</span><em>→</em><span>Approval</span><em>→</em><span>Telegram</span><em>→</em><span>Published</span></div>
+        <details><summary>How it works</summary>
+          <ul>
+            <li>Two scenarios, one to generate posts and one to publish them, linked by a status field in Airtable</li>
+            <li>Uses "Last Modified Time" as the trigger, so an approval fires as soon as the status changes</li>
+            <li>The publishing scenario runs every 15 minutes and records the publish date</li>
+          </ul>
+        </details>
+      </article>
+
+      <article class="project reveal d1" data-cat="ai content">
+        <div class="p-top"><span class="status designed">Designed</span><span class="date">n8n · Multi-agent</span></div>
+        <h3>Multi-Channel AI Content Agent</h3>
+        <p>Takes a topic from an Airtable content calendar, rewrites it for LinkedIn, Instagram and X, and publishes it automatically, with an AI review step before anything goes live.</p>
+        <div class="chain"><span>Calendar</span><em>→</em><span>Strategist agent</span><em>→</em><span>Writer agents</span><em>→</em><span>Reviewer</span><em>→</em><span>Publish</span></div>
+        <details><summary>How it works</summary>
+          <ul>
+            <li>A strategist agent hands each topic to a separate writer agent for each platform</li>
+            <li>A reviewer returns {approved, reason}; if a post fails, it is marked "Needs Review" and an alert goes out</li>
+            <li>Posts X threads in a loop, each tweet replying to the one before</li>
+            <li>Publishes to Instagram in two Graph API steps: create a container, then publish it</li>
+          </ul>
+        </details>
+      </article>
+
+      <article class="project reveal" data-cat="ai email content">
+        <div class="p-top"><span class="status product">Digital product</span><span class="date">Make.com · ChatGPT</span></div>
+        <h3>Make.com + ChatGPT Automation Kit</h3>
+        <p>A ready-to-use kit with 5 automation blueprints, a bank of 20 prompts and a setup guide, sold as a digital product on Etsy.</p>
+        <div class="chain"><span>Email Responder</span><span>Content Repurposer</span><span>Lead Qualifier</span><span>Meeting Summarizer</span><span>Review Responder</span></div>
+        <details><summary>What's inside</summary>
+          <ul>
+            <li>The AI Review Responder matches its tone to the star rating, sends drafts to Slack for approval, and always has a person check negative reviews</li>
+            <li>Prompt categories: lead qualification, content, customer service, email and meetings</li>
+          </ul>
+        </details>
+      </article>
+    </div>
+    <p class="note reveal">All projects are self-initiated demo builds, test tasks or products, tested end to end in my own accounts.</p>
+    <div class="more reveal"><a class="btn outline" href="https://www.upwork.com/freelancers/~017cfb05fbe9def481" target="_blank" rel="noopener">See the full portfolio on Upwork →</a></div>
+  </div>
+</section>
+
+<!-- ================= PROCESS (blue) ================= -->
+<section class="blue" id="process">
+  <div class="wrap">
+    <span class="eyebrow reveal">How I work</span>
+    <h2 class="reveal">From messy manual work to a system that runs itself</h2>
+    <p class="lead reveal">I start with your problem, not with the tool. You get a clear plan, a choice of tools, and a workflow you can understand and update yourself.</p>
+    <div class="steps">
+      <div class="step reveal"><div class="num">1</div><h4>Discover</h4><p>What's slow, what's manual, and what does "done" look like for you?</p></div>
+      <div class="step reveal d1"><div class="num">2</div><h4>Plan</h4><p>A step-by-step build plan, with tool options and their trade-offs.</p></div>
+      <div class="step reveal d2"><div class="num">3</div><h4>Build</h4><p>Clearly named nodes and a clean structure, one channel end to end first.</p></div>
+      <div class="step reveal d3"><div class="num">4</div><h4>Harden</h4><p>Error handlers, Telegram alerts and protection against duplicate runs.</p></div>
+      <div class="step reveal d4"><div class="num">5</div><h4>Hand over</h4><p>Written documentation and a Loom walkthrough, so you're never stuck.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CERTS + PLAYBOOK (ice/white) ================= -->
+<section class="ice" id="certs">
+  <div class="wrap">
+    <span class="eyebrow reveal">Credentials & know-how</span>
+    <h2 class="reveal">Certified, and learning every week</h2>
+    <div class="two">
+      <div>
+        <div class="cert reveal"><div class="icon">🎓</div><div><h4>Make Foundation</h4><small>Make.com Academy</small></div></div>
+        <div class="cert reveal d1"><div class="icon">🧠</div><div><h4>AI Automation Explorer</h4><small>Make.com Academy</small></div></div>
+        <div class="cert reveal d2"><div class="icon">📬</div><div><h4>MASC Marketing Automation Certification</h4><small>Marketing automation</small></div></div>
+      </div>
+      <div class="tips reveal d1">
+        <h4>From my automation playbook</h4>
+        <div class="tip" id="tip"></div>
+        <div class="tip-dots" id="tipDots"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT (blue) ================= -->
+<section class="blue" id="contact">
+  <div class="blob b1" style="top:auto;bottom:-120px;right:-100px"></div>
+  <div class="wrap contact-box">
+    <!-- PHOTO: assets/photo.jpg -->
+    <div class="photo-ring reveal" id="photoRing">
+      <div class="inner">
+        <img src="assets/photo.jpg" alt="Hanna Melnik" onerror="document.getElementById('photoRing').classList.add('noimg')">
+        <span class="initials">HM</span>
+      </div>
+    </div>
+    <div>
+      <span class="eyebrow reveal">Contact</span>
+      <h2 class="reveal">Got a manual process that eats your week?</h2>
+      <p class="lead reveal">Tell me what it is. I'll reply with a concrete plan for automating it, including which tools, which steps, and what "done" looks like.</p>
+      <div class="contact-links reveal">
+        <a class="btn primary" href="https://www.upwork.com/freelancers/~017cfb05fbe9def481" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.56 13.17c-1.02 0-1.98-.43-2.85-1.13l.21-1 .01-.04c.19-1.06.79-2.84 2.63-2.84a2.5 2.5 0 0 1 0 5.01Zm0-7.54c-2.35 0-4.17 1.53-4.91 4.04-1.13-1.7-1.99-3.74-2.49-5.46H8.62v6.59a2.26 2.26 0 0 1-4.52 0V4.21H1.57v6.59a4.79 4.79 0 0 0 9.58 0V9.7c.46.96 1.03 1.93 1.72 2.8l-1.46 6.87h2.59l1.06-4.98c.93.6 2 .97 3.24.97a5 5 0 0 0 0-10.03Z"/></svg>
+          Hire me on Upwork
+        </a>
+        <a class="btn ghost" href="https://www.linkedin.com/in/hanna-melnik-4160a1390" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg>
+          Connect on LinkedIn
+        </a>
+      </div>
+      <p class="reply reveal">⏱️ I reply within 5 hours, with a specific plan.</p>
+    </div>
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged screenshot">
+  <button aria-label="Close">×</button>
+  <figure><img id="lbImg" alt=""><p id="lbCap"></p></figure>
+</div>
+
+<footer>© <span id="year"></span> Hanna Melnik · AI Automation · Marketing Automation · Email Marketing</footer>
+
+<script>
+  // Year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Nav background + mobile menu
+  const nav = document.getElementById('nav');
+  addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 30), { passive: true });
+  const links = document.getElementById('navLinks');
+  document.getElementById('menuBtn').onclick = () => links.classList.toggle('open');
+  links.querySelectorAll('a').forEach(a => a.onclick = () => links.classList.remove('open'));
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Typing effect
+  const words = ['AI automations', 'Telegram AI bots', 'email sequences', 'n8n workflows', 'Make.com scenarios', 'CRM integrations', 'AI agents'];
+  const typed = document.getElementById('typed');
+  if (!reduce) {
+    let w = 0, c = words[0].length, del = true;
+    (function tick() {
+      const word = words[w];
+      c += del ? -1 : 1;
+      typed.textContent = word.slice(0, c);
+      let wait = del ? 45 : 85;
+      if (!del && c === word.length) { del = true; wait = 1600; }
+      else if (del && c === 0) { del = false; w = (w + 1) % words.length; wait = 300; }
+      setTimeout(tick, wait);
+    })();
+  }
+
+  // Live workflow log
+  const log = document.getElementById('flowLog');
+  const leads = [
+    ['anna@studio.io', 'hot'], ['mark@bakery.com', 'warm'], ['olga@fitlab.ua', 'cold'],
+    ['sam@agency.co', 'hot'], ['lena@shop.eu', 'warm']
+  ];
+  const steps = [
+    l => `→ webhook: new lead ${l[0]}`,
+    l => `→ ActiveCampaign: tag = ${l[1]}`,
+    () => `→ Claude: writing personalised email…`,
+    () => `→ Gmail: sent`,
+    () => `<span class="ok">✅ Telegram: "Email sent" · 4.2s</span>`
+  ];
+  let li = 0, si = 0;
+  function logTick() {
+    const d = document.createElement('div');
+    d.innerHTML = steps[si](leads[li]);
+    log.appendChild(d);
+    while (log.children.length > 3) log.removeChild(log.firstChild);
+    si++;
+    if (si === steps.length) { si = 0; li = (li + 1) % leads.length; }
+  }
+  logTick(); setInterval(logTick, 1300);
+
+  // Duplicate marquee for seamless loop
+  const track = document.getElementById('track');
+  track.innerHTML += track.innerHTML;
+
+  // Reveal on scroll + counters
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      const n = e.target.querySelector('[data-count]');
+      if (n) countUp(n);
+      io.unobserve(e.target);
+    });
+  }, { threshold: .15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  function countUp(el) {
+    const end = +el.dataset.count, pre = el.dataset.prefix ? el.dataset.prefix.replace('&lt;', '<') : '', suf = el.dataset.suffix || '';
+    if (reduce) { el.textContent = pre + end + suf; return; }
+    const t0 = performance.now(), dur = 1400;
+    (function step(t) {
+      const p = Math.min((t - t0) / dur, 1);
+      el.textContent = pre + Math.round(end * (1 - Math.pow(1 - p, 3))) + suf;
+      if (p < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+
+  // Project filters
+  document.getElementById('filters').addEventListener('click', e => {
+    const b = e.target.closest('.filter'); if (!b) return;
+    document.querySelectorAll('.filter').forEach(x => x.classList.toggle('active', x === b));
+    const f = b.dataset.f;
+    document.querySelectorAll('.project').forEach(p => {
+      p.classList.toggle('hide', f !== 'all' && !p.dataset.cat.split(' ').includes(f));
+    });
+  });
+
+  // Screenshot lightbox
+  const lb = document.getElementById('lightbox'), lbImg = document.getElementById('lbImg'), lbCap = document.getElementById('lbCap');
+  document.querySelectorAll('.media img[data-caption]').forEach(img => img.addEventListener('click', () => {
+    lbImg.src = img.src; lbImg.alt = img.alt; lbCap.textContent = img.dataset.caption;
+    lb.classList.add('open');
+  }));
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+  addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+
+  // Playbook tips carousel
+  const tips = [
+    'Give every node a <b>clear name before</b> writing expressions. Renaming later breaks references.',
+    'Always build an <b>error workflow</b>: Error Trigger → Telegram, with the execution URL and the failed node.',
+    'Whenever webhooks are involved, design for <b>idempotency</b>: an idempotency key, upserts and status guards.',
+    'Ask the LLM for <b>strict JSON</b> and parse it in a Code node. No guessing.',
+    'Keep a <b>person in the loop</b> for sensitive output until the moderation gate has earned trust.',
+    'Keep <b>cheap or free models</b> (OpenRouter, Groq) as a fallback for rate limits.',
+    'Telegram channel IDs start with <b>-100</b>, and the bot must be an admin to post.'
+  ];
+  const tipEl = document.getElementById('tip'), dots = document.getElementById('tipDots');
+  let ti = 0, timer;
+  tips.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.setAttribute('aria-label', 'Tip ' + (i + 1));
+    b.onclick = () => { showTip(i); restart(); };
+    dots.appendChild(b);
+  });
+  function showTip(i) {
+    ti = i;
+    tipEl.style.opacity = 0;
+    setTimeout(() => { tipEl.innerHTML = tips[i]; tipEl.style.opacity = 1; }, 200);
+    [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i));
+  }
+  function restart() { clearInterval(timer); timer = setInterval(() => showTip((ti + 1) % tips.length), 4500); }
+  showTip(0); restart();
+</script>
+</body>
+</html>
